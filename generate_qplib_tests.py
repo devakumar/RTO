@@ -52,6 +52,43 @@ public:
 
 	return Problem
 
+def get_qp_problem_from_file(problem, QPname, writeTo = "qplib"):
+	P = problem['P'].A
+	q = problem['q']
+	A = problem['A'].A
+	l = problem['l']
+	u = problem['u']
+	n, m = problem['n'], problem['m']
+
+	folder = writeTo + os.sep + QPname
+	if not os.path.exists(folder):
+		os.system("mkdir -p {}".format(folder))
+	
+	Mats = ['P', 'q', 'A', 'l', 'u']
+	files = [folder + os.sep + M + ".csv" for M in Mats]
+	for i, M in enumerate([P, q, A, l, u]):
+		np.savetxt(files[i], M, delimiter=',', fmt='%.4f')
+	Problem = """\ntemplate <typename _Scalar=double>
+class _{0} : public QP<{1}, {2}, _Scalar>
+{{
+public:
+	_{0}()
+	{{
+		Eigen::MatrixXd P = load_csv<Eigen::MatrixXd>("{3}");
+		Eigen::MatrixXd q = load_csv<Eigen::MatrixXd>("{4}");
+		Eigen::MatrixXd A = load_csv<Eigen::MatrixXd>("{5}");
+		Eigen::MatrixXd l = load_csv<Eigen::MatrixXd>("{6}");
+		Eigen::MatrixXd u = load_csv<Eigen::MatrixXd>("{7}");
+		this->P = P;
+		this->q = q;
+		this->A = A;
+		this->l = l;
+		this->u = u;
+	}}
+}};\n""".format(QPname, n, m, files[0], files[0], files[1], files[2], files[3])
+
+	return Problem
+
 def test_QP(QPname):
 	TEST = """\nusing {0} = _{0}<double>;
 
@@ -106,7 +143,7 @@ TEST(QPProblemSets, testQP{0}adaptive) {{
 
 if __name__ == "__main__":
 	#Load problem from QPLIB
-	cases = ["0018", "0343", "2712"]
+	cases = ["0018", "0343"]#, "2712"]
 
 	test_cases = []
 
@@ -115,6 +152,7 @@ if __name__ == "__main__":
 
 		QPname = "QP" + ID
 		# Convert problem to polympc format
+		#qp_problem = get_qp_problem_from_file(problem, QPname)
 		qp_problem = get_qp_problem(problem, QPname)
 
 		test = test_QP(QPname)
