@@ -1,6 +1,7 @@
 import os
 import numpy as np
 from problem_classes.qplib import QPLIB
+from random_qp import RandomQPExample
 
 def get_qplib_problem(ID = '0018', path='problem_classes/qplib_data'):
 	loc = path + os.sep + 'QPLIB_' + ID + '.qplib'
@@ -10,6 +11,18 @@ def get_qplib_problem(ID = '0018', path='problem_classes/qplib_data'):
 		problem = QPLIB(loc).qp_problem
 	else :
 		problem = dict()
+	
+	return problem
+
+def get_random_qp_problem(n, SEED=1):
+	problem = RandomQPExample(n, seed=SEED).qp_problem
+	
+	return problem
+
+def get_portfolio_qp_problem(k, SEED=1, n=None):
+	#k - Number of factors, n = k*100 default
+	#n - number of assets
+	problem = PortfolioExample(n, seed=SEED).qp_problem
 	
 	return problem
 
