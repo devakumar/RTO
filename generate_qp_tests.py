@@ -1,6 +1,7 @@
 import os
 import numpy as np
 from problem_classes.qplib import QPLIB
+from random_qp import RandomQPExample
 
 def get_qplib_problem(ID = '0018', path='problem_classes/qplib_data'):
 	loc = path + os.sep + 'QPLIB_' + ID + '.qplib'
@@ -10,6 +11,18 @@ def get_qplib_problem(ID = '0018', path='problem_classes/qplib_data'):
 		problem = QPLIB(loc).qp_problem
 	else :
 		problem = dict()
+	
+	return problem
+
+def get_random_qp_problem(n, SEED=1):
+	problem = RandomQPExample(n, seed=SEED).qp_problem
+	
+	return problem
+
+def get_portfolio_qp_problem(k, SEED=1, n=None):
+	#k - Number of factors, n = k*100 default
+	#n - number of assets
+	problem = PortfolioExample(n, seed=SEED).qp_problem
 	
 	return problem
 
@@ -85,7 +98,7 @@ public:
 		this->l = l;
 		this->u = u;
 	}}
-}};\n""".format(QPname, n, m, files[0], files[1], files[2], files[3], files[4])
+}};\n""".format(QPname, n, m, files[0], files[0], files[1], files[2], files[3])
 
 	return Problem
 
@@ -143,7 +156,7 @@ TEST(QPProblemSets, testQP{0}adaptive) {{
 
 if __name__ == "__main__":
 	#Load problem from QPLIB
-	cases = ["0018"]#, "0343"]#, "2712"]
+	cases = ["0018", "0343"]#, "2712"]
 
 	test_cases = []
 
@@ -152,14 +165,14 @@ if __name__ == "__main__":
 
 		QPname = "QP" + ID
 		# Convert problem to polympc format
-		qp_problem = get_qp_problem_from_file(problem, QPname)
-		#qp_problem = get_qp_problem(problem, QPname)
+		#qp_problem = get_qp_problem_from_file(problem, QPname)
+		qp_problem = get_qp_problem(problem, QPname)
 
 		test = test_QP(QPname)
 
 		test_cases.extend([qp_problem, test])
 
-	with open("qplib_problem_sets.cpp", 'w') as f:
+	with open(f"qplib_problem_sets.cpp", 'w') as f:
 		lines = [HEADER]
 		lines.extend(test_cases)
 		f.writelines(lines)
