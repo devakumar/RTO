@@ -85,7 +85,7 @@ public:
 		this->l = l;
 		this->u = u;
 	}}
-}};\n""".format(QPname, n, m, files[0], files[0], files[1], files[2], files[3])
+}};\n""".format(QPname, n, m, files[0], files[1], files[2], files[3], files[4])
 
 	return Problem
 
@@ -143,7 +143,7 @@ TEST(QPProblemSets, testQP{0}adaptive) {{
 
 if __name__ == "__main__":
 	#Load problem from QPLIB
-	cases = ["0018", "0343"]#, "2712"]
+	cases = ["0018"]#, "0343"]#, "2712"]
 
 	test_cases = []
 
@@ -152,14 +152,14 @@ if __name__ == "__main__":
 
 		QPname = "QP" + ID
 		# Convert problem to polympc format
-		#qp_problem = get_qp_problem_from_file(problem, QPname)
-		qp_problem = get_qp_problem(problem, QPname)
+		qp_problem = get_qp_problem_from_file(problem, QPname)
+		#qp_problem = get_qp_problem(problem, QPname)
 
 		test = test_QP(QPname)
 
 		test_cases.extend([qp_problem, test])
 
-	with open(f"qplib_problem_sets.cpp", 'w') as f:
+	with open("qplib_problem_sets.cpp", 'w') as f:
 		lines = [HEADER]
 		lines.extend(test_cases)
 		f.writelines(lines)
